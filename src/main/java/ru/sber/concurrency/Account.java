@@ -36,6 +36,7 @@ public class Account {
                 } catch (InterruptedException e) { }
             }
             balance -= k;
+            condition.signalAll();
         }
         finally {
             lock.unlock();
