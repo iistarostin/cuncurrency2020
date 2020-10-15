@@ -26,7 +26,7 @@ public class SimpleReadWriteLock {
                 synchronized (SimpleReadWriteLock.this) {
                     while (writer) {
                         try {
-                            wait();
+                            SimpleReadWriteLock.this.wait();
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -38,8 +38,8 @@ public class SimpleReadWriteLock {
             @Override
             public void unlock() {
                 synchronized (SimpleReadWriteLock.this) {
-                    readers--;
-                    if (readers == 0) notifyAll();
+                    --readers;
+                    if (readers == 0) SimpleReadWriteLock.this.notifyAll();
                 }
             }
         };
@@ -50,7 +50,7 @@ public class SimpleReadWriteLock {
                 synchronized (SimpleReadWriteLock.this) {
                     while (readers > 0 || writer) {
                         try {
-                            wait();
+                            SimpleReadWriteLock.this.wait();
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -63,7 +63,7 @@ public class SimpleReadWriteLock {
             public void unlock() {
                 synchronized (SimpleReadWriteLock.this) {
                     writer = false;
-                    notifyAll();
+                    SimpleReadWriteLock.this.notifyAll();
                 }
             }
         };

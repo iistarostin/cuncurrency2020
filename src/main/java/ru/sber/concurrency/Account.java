@@ -4,6 +4,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.String.format;
+
 public class Account {
     private final Lock lock;
     private final Condition condition;
@@ -11,6 +13,9 @@ public class Account {
     private int preferredCount = 0;
 
     public Account(int balance) {
+        if (balance < 0) {
+            throw new IllegalArgumentException(format("Balance must be nonnegative, provided: %d", balance));
+        }
         this.balance = balance;
         lock = new ReentrantLock();
         condition = lock.newCondition();
@@ -33,10 +38,11 @@ public class Account {
             while (balance < k || preferredCount > 0) {
                 try {
                     condition.await();
-                } catch (InterruptedException e) { }
+                } catch (InterruptedException e) {
+                    return;
+                }
             }
             balance -= k;
-            condition.signalAll();
         }
         finally {
             lock.unlock();
@@ -50,7 +56,9 @@ public class Account {
             while (balance < k) {
                 try {
                     condition.await();
-                } catch (InterruptedException e) { }
+                } catch (InterruptedException e) {
+                    return;
+                }
             }
             balance -= k;
         }
@@ -69,6 +77,5 @@ public class Account {
         } finally {
             lock.unlock();
         }
-
     }
 }
