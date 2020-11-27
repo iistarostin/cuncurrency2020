@@ -1,7 +1,6 @@
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.String.*;
@@ -60,7 +59,7 @@ public class Logger {
         public String prettyPrint() {
             return format(
                     "N: \t\t\t\t%d\n" +
-                    "Sent:\t\t\t%d\n" +
+                            "Sent:\t\t\t%d\n" +
                             "Received:\t\t%d\n" +
                             "Lost:\t\t\t%d (%f %%)\n" +
                             "Avg. delay:\t\t%f microseconds\n" +

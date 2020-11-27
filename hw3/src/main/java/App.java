@@ -1,13 +1,12 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Math.pow;
 import static java.time.LocalDateTime.now;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
@@ -15,13 +14,13 @@ public class App {
     static final int secondsToRun = 10;
 
     public static void main(String[] args) throws FileNotFoundException {
-        File benchmark = new File("benchmark_2.csv");
+        File benchmark = new File("benchmark_3.csv");
         try (PrintWriter pw = new PrintWriter(benchmark)) {
             pw.print(
                     benchmark()
                             .peek(log -> System.out.println(log.prettyPrint()))
                             .map(Logger.Logs::toCsvRow)
-                            .collect(Collectors.joining("\n")));
+                            .collect(joining("\n")));
         }
     }
 

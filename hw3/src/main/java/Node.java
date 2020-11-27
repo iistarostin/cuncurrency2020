@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static java.lang.String.valueOf;
 import static java.time.LocalDateTime.now;
-import static java.util.Optional.ofNullable;
+import static java.util.Objects.nonNull;
 
 @RequiredArgsConstructor
 public class Node {
@@ -20,13 +20,23 @@ public class Node {
 
     public void run() {
         while (now().isBefore(timeToStop)) {
-            tryReceive();
-            if (ThreadLocalRandom.current().nextDouble() < newMsgProbability) sendNewMessage();
+            var nProcessed = tryReceive();
+            //in order to preserve the expected total number of messages sent compared to previous models,
+            //after processing a node gets a chance to send new msg for each processed msg
+            while (nProcessed-- >= 0) {
+                if (ThreadLocalRandom.current().nextDouble() < newMsgProbability) sendNewMessage();
+            }
         }
     }
 
-    private void tryReceive() {
-        ofNullable(ingress.tryReceive()).ifPresent(this::processMsg);
+    private int tryReceive() {
+        int nProcessed = 0;
+        Message next;
+        while (nonNull(next = ingress.tryReceive())) {
+            nProcessed++;
+            processMsg(next);
+        }
+        return nProcessed;
     }
 
     private void processMsg(Message msg) {
