@@ -1,3 +1,4 @@
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class Node {
 
     private final Network.RequestTemplate ingress;
     private final Network.RequestTemplate egress;
+    @Getter
     private final Logger logger;
 
     public void run() {

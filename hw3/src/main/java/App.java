@@ -14,7 +14,7 @@ public class App {
     static final int secondsToRun = 10;
 
     public static void main(String[] args) throws FileNotFoundException {
-        File benchmark = new File("benchmark_3.csv");
+        File benchmark = new File("benchmark_4.csv");
         try (PrintWriter pw = new PrintWriter(benchmark)) {
             pw.print(
                     benchmark()
@@ -40,24 +40,23 @@ public class App {
 
     private static Logger test(final int N, final int secondsToRun, final double newMsgProbability) throws InterruptedException {
         final Network network = new Network(N);
-        final Logger logger = new Logger(N, secondsToRun);
-        var threads = range(0, N)
-                .mapToObj(i -> new Thread(() -> {
-                    final Node node = new Node(
-                            i,
-                            N,
-                            now().plusSeconds(secondsToRun),
-                            newMsgProbability,
-                            network.from((N + i - 1) % N).to(i),
-                            network.from(i).to((i + 1) % N),
-                            logger);
-                    node.run();
-                }))
+        var nodes = range(0, N)
+                .mapToObj(i -> new Node(
+                        i,
+                        N,
+                        now().plusSeconds(secondsToRun),
+                        newMsgProbability,
+                        network.from((N + i - 1) % N).to(i),
+                        network.from(i).to((i + 1) % N),
+                        new Logger(N, secondsToRun)
+                )).collect(toList());
+        var threads = nodes.stream()
+                .map(node -> new Thread(node::run))
                 .peek(Thread::start)
                 .collect(toList());
         for (Thread thread : threads) {
             thread.join();
         }
-        return logger;
+        return Logger.joint(nodes.stream().map(Node::getLogger).collect(toList()));
     }
 }
